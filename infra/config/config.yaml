@@ -1,0 +1,69 @@
+# All configuration options of the service will be specified here.
+
+# Service's info.
+service:
+  cluster: local
+  namespace: default
+  # Component are: api, subscriber, worker
+  component: api
+
+# HTTP server configuration.
+# This configuration is loaded by: github.com/axieinfinity/go-sm-kit/net/http/httpimpl.options.ConfigLoader.
+http_server:
+  # The server address.
+  addr: 0.0.0.0:8000
+  # Only enable CORS for development/ci environment, use API gateway for staging/production
+  # instead.
+  cors: true
+
+# Asynq configuration.
+asynq:
+  # The queue of Asynq's task.
+  queue: dev:default:item
+  # The number of concurrency worker.
+  concurrency: 10
+  # Redis configuration of Asynq backend.
+  redis:
+    # URI to connect to redis server.
+    # Format: redis://:[password]@address:port/database
+    uri: redis://localhost:6379/0
+    # The maximum conns in the conn pool.
+    pool_size: 10
+    # The amount of time an idle connection will remain idle before closing.
+    idle_conn_timeout: 10m
+    # The time to wait to submit a read command to server before timing out.
+    read_timeout: 3s
+    # The time to wait to submit a write command to server before timing out.
+    write_timeout: 3s
+    # The time to wait of establishing new connections to the Redis server.
+    dial_timeout: 5s
+
+# Cache configuration.
+redis:
+  clients:
+    default:
+      # URI to connect to redis server.
+          # Format: redis://:[password]@address:port/database
+          uri: redis://localhost:6379/0
+          # The maximum conns in the conn pool.
+          pool_size: 10
+          # The minimum idle conns in the conn pool.
+          min_idle_conns: 2
+          # The amount of time an idle connection will remain idle before closing.
+          idle_conn_timeout: 10m
+          # The time to wait to submit a read command to server before timing out.
+          read_timeout: 3s
+          # The time to wait to submit a write command to server before timing out.
+          write_timeout: 3s
+          # The time to wait of establishing new connections to the Redis server.
+          dial_timeout: 5s
+
+# Postgresql configuration.
+postgres:
+  master:
+    uri: postgres://<user>:<password>@localhost:5432/<db_name>?sslmode=disable
+  slave:
+    uri: postgres://<user>:<password>@localhost:5432/<db_name>?sslmode=disable
+  max_idle_conns: 5
+  max_active_conns: 10
+  max_conn_timeout: 10m
