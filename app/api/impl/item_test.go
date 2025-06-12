@@ -13,6 +13,15 @@ import (
 	"github.com/nhatquangsin/game-service/infra/utils"
 )
 
+type itemRepoFindByItemIDsArgs struct {
+	itemIDs []string
+}
+
+type itemRepoFindByItemIDsWant struct {
+	items []*entity.Item
+	err   error
+}
+
 func TestItemService_ListItems(t *testing.T) {
 	type args struct {
 		req *api.ListItemsRequest
@@ -24,6 +33,9 @@ func TestItemService_ListItems(t *testing.T) {
 		err     error
 		wantErr bool
 		wantRes *api.ListItemsResponse
+
+		itemRepoFindByItemIDsArgs *itemRepoFindByItemIDsArgs
+		itemRepoFindByItemIDsWant *itemRepoFindByItemIDsWant
 	}{
 		{
 			name: "TC01 - request items empty, limit 10, offset 0 - should return all items",
@@ -36,23 +48,23 @@ func TestItemService_ListItems(t *testing.T) {
 			wantErr: false,
 			wantRes: &api.ListItemsResponse{
 				Items: []*api.Item{
-					&api.Item{
+					{
 						ID:          "item_1",
 						Description: "desc 1",
 					},
-					&api.Item{
+					{
 						ID:          "item_2",
 						Description: "desc 2",
 					},
-					&api.Item{
+					{
 						ID:          "item_3",
 						Description: "desc 3",
 					},
-					&api.Item{
+					{
 						ID:          "item_4",
 						Description: "desc 4",
 					},
-					&api.Item{
+					{
 						ID:          "item_5",
 						Description: "desc 5",
 					},
@@ -76,15 +88,15 @@ func TestItemService_ListItems(t *testing.T) {
 			wantErr: false,
 			wantRes: &api.ListItemsResponse{
 				Items: []*api.Item{
-					&api.Item{
+					{
 						ID:          "item_1",
 						Description: "desc 1",
 					},
-					&api.Item{
+					{
 						ID:          "item_2",
 						Description: "desc 2",
 					},
-					&api.Item{
+					{
 						ID:          "item_3",
 						Description: "desc 3",
 					},
@@ -108,15 +120,15 @@ func TestItemService_ListItems(t *testing.T) {
 			wantErr: false,
 			wantRes: &api.ListItemsResponse{
 				Items: []*api.Item{
-					&api.Item{
+					{
 						ID:          "item_2",
 						Description: "desc 2",
 					},
-					&api.Item{
+					{
 						ID:          "item_3",
 						Description: "desc 3",
 					},
-					&api.Item{
+					{
 						ID:          "item_4",
 						Description: "desc 4",
 					},
@@ -140,11 +152,11 @@ func TestItemService_ListItems(t *testing.T) {
 			wantErr: false,
 			wantRes: &api.ListItemsResponse{
 				Items: []*api.Item{
-					&api.Item{
+					{
 						ID:          "item_4",
 						Description: "desc 4",
 					},
-					&api.Item{
+					{
 						ID:          "item_5",
 						Description: "desc 5",
 					},
@@ -157,6 +169,134 @@ func TestItemService_ListItems(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "TC05 - request items 1, limit 2, offset 0 - should return 1 items",
+			args: args{
+				&api.ListItemsRequest{
+					ItemIDs: []string{"item_3"},
+					Limit:   2,
+					Offset:  0,
+				},
+			},
+			wantErr: false,
+			wantRes: &api.ListItemsResponse{
+				Items: []*api.Item{
+					{
+						ID:          "item_3",
+						Description: "desc 3",
+					},
+				},
+				Metadata: utils.PageMetadata{
+					Total:   utils.Of(1),
+					HasNext: utils.Of(false),
+					Limit:   utils.Of(2),
+					Offset:  utils.Of(0),
+				},
+			},
+			itemRepoFindByItemIDsArgs: &itemRepoFindByItemIDsArgs{
+				itemIDs: []string{"item_3"},
+			},
+			itemRepoFindByItemIDsWant: &itemRepoFindByItemIDsWant{
+				items: []*entity.Item{
+					{
+						ID:          "item_3",
+						Description: "desc 3",
+					},
+				},
+			},
+		},
+		{
+			name: "TC06 - request items 3, limit 2, offset 0 - should return 2 items",
+			args: args{
+				&api.ListItemsRequest{
+					ItemIDs: []string{"item_3", "item_1", "item_5"},
+					Limit:   2,
+					Offset:  0,
+				},
+			},
+			wantErr: false,
+			wantRes: &api.ListItemsResponse{
+				Items: []*api.Item{
+					{
+						ID:          "item_3",
+						Description: "desc 3",
+					},
+					{
+						ID:          "item_1",
+						Description: "desc 1",
+					},
+				},
+				Metadata: utils.PageMetadata{
+					Total:   utils.Of(3),
+					HasNext: utils.Of(true),
+					Limit:   utils.Of(2),
+					Offset:  utils.Of(0),
+				},
+			},
+			itemRepoFindByItemIDsArgs: &itemRepoFindByItemIDsArgs{
+				itemIDs: []string{"item_3", "item_1", "item_5"},
+			},
+			itemRepoFindByItemIDsWant: &itemRepoFindByItemIDsWant{
+				items: []*entity.Item{
+					{
+						ID:          "item_3",
+						Description: "desc 3",
+					},
+					{
+						ID:          "item_1",
+						Description: "desc 1",
+					},
+					{
+						ID:          "item_5",
+						Description: "desc 5",
+					},
+				},
+			},
+		},
+		{
+			name: "TC07 - request items 3, limit 2, offset 2 - should return 1 items",
+			args: args{
+				&api.ListItemsRequest{
+					ItemIDs: []string{"item_3", "item_1", "item_5"},
+					Limit:   2,
+					Offset:  2,
+				},
+			},
+			wantErr: false,
+			wantRes: &api.ListItemsResponse{
+				Items: []*api.Item{
+					{
+						ID:          "item_5",
+						Description: "desc 5",
+					},
+				},
+				Metadata: utils.PageMetadata{
+					Total:   utils.Of(3),
+					HasNext: utils.Of(false),
+					Limit:   utils.Of(2),
+					Offset:  utils.Of(2),
+				},
+			},
+			itemRepoFindByItemIDsArgs: &itemRepoFindByItemIDsArgs{
+				itemIDs: []string{"item_3", "item_1", "item_5"},
+			},
+			itemRepoFindByItemIDsWant: &itemRepoFindByItemIDsWant{
+				items: []*entity.Item{
+					{
+						ID:          "item_3",
+						Description: "desc 3",
+					},
+					{
+						ID:          "item_1",
+						Description: "desc 1",
+					},
+					{
+						ID:          "item_5",
+						Description: "desc 5",
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -164,27 +304,34 @@ func TestItemService_ListItems(t *testing.T) {
 			ctx := context.Background()
 			itemRepo := repo.NewMockItemRepo(t)
 
+			if len(tt.args.req.ItemIDs) > 0 {
+				itemRepo.EXPECT().FindByItemIDs(ctx, tt.itemRepoFindByItemIDsArgs.itemIDs).Return(
+					tt.itemRepoFindByItemIDsWant.items,
+					tt.itemRepoFindByItemIDsWant.err,
+				).Once()
+			}
+
 			svc := &ItemService{
 				itemRepo: itemRepo,
 				cachedItems: &cache.CachedItems{
 					Items: []*entity.Item{
-						&entity.Item{
+						{
 							ID:          "item_1",
 							Description: "desc 1",
 						},
-						&entity.Item{
+						{
 							ID:          "item_2",
 							Description: "desc 2",
 						},
-						&entity.Item{
+						{
 							ID:          "item_3",
 							Description: "desc 3",
 						},
-						&entity.Item{
+						{
 							ID:          "item_4",
 							Description: "desc 4",
 						},
-						&entity.Item{
+						{
 							ID:          "item_5",
 							Description: "desc 5",
 						},
