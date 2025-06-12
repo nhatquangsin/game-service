@@ -2,7 +2,9 @@ package api
 
 import (
 	"context"
+	"net/http"
 
+	"github.com/go-chi/render"
 	"github.com/nhatquangsin/game-service/domain/entity"
 	"github.com/nhatquangsin/game-service/infra/utils"
 )
@@ -33,4 +35,13 @@ type ListItemsRequest struct {
 type ListItemsResponse struct {
 	Items    []*entity.Item     `field:"_items" json:"_items,omitempty"`
 	Metadata utils.PageMetadata `field:"_metadata" json:"_metadata,omitempty"`
+}
+
+func (l *ListItemsRequest) Bind(r *http.Request) error {
+	panic("unimplemented")
+}
+
+func (l *ListItemsResponse) Render(w http.ResponseWriter, r *http.Request) error {
+	render.Status(r, 200)
+	panic("unimplemented")
 }

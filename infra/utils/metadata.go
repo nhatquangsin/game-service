@@ -1,5 +1,11 @@
 package utils
 
+// ItemMetadata represents item's meta data in item response.
+type ItemMetadata struct {
+	ETag  string `json:"_etag,omitempty"`
+	IsNew *bool  `json:"_isNew,omitempty"`
+}
+
 // BatchMetadata represents batch actions metadata of result for batch actions
 // in service.
 type BatchMetadata struct {

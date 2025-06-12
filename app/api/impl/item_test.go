@@ -12,14 +12,6 @@ import (
 	"github.com/nhatquangsin/game-service/infra/utils"
 )
 
-func ptrInt(n int) *int {
-	return &n
-}
-
-func ptrBool(b bool) *bool {
-	return &b
-}
-
 func TestItemService_ListItems(t *testing.T) {
 	type args struct {
 		req *api.ListItemsRequest
@@ -33,7 +25,7 @@ func TestItemService_ListItems(t *testing.T) {
 		wantRes *api.ListItemsResponse
 	}{
 		{
-			name: "test_case_1",
+			name: "TC01 - Should return 2 items when total 2 items, limit 10 offset 0",
 			args: args{
 				req: &api.ListItemsRequest{
 					Limit:  10,
@@ -53,10 +45,57 @@ func TestItemService_ListItems(t *testing.T) {
 					},
 				},
 				Metadata: utils.PageMetadata{
-					Total:   ptrInt(2),
-					HasNext: ptrBool(false),
-					Limit:   ptrInt(10),
-					Offset:  ptrInt(0),
+					Total:   utils.Of(2),
+					HasNext: utils.Of(false),
+					Limit:   utils.Of(10),
+					Offset:  utils.Of(0),
+				},
+			},
+		},
+		{
+			name: "TC02 - Should return no item when total 2 items, limit 10 offset 1",
+			args: args{
+				req: &api.ListItemsRequest{
+					Limit:  10,
+					Offset: 1,
+				},
+			},
+			wantErr: false,
+			wantRes: &api.ListItemsResponse{
+				Items: []*entity.Item{},
+				Metadata: utils.PageMetadata{
+					Total:   utils.Of(2),
+					HasNext: utils.Of(false),
+					Limit:   utils.Of(10),
+					Offset:  utils.Of(1),
+				},
+			},
+		},
+		{
+			name: "TC03 - Should return 1 item when total 3 items, limit 1 offset 0",
+			args: args{
+				req: &api.ListItemsRequest{
+					Limit:  1,
+					Offset: 1,
+				},
+			},
+			wantErr: false,
+			wantRes: &api.ListItemsResponse{
+				Items: []*entity.Item{
+					&entity.Item{
+						ID:   "id_1",
+						Name: "name_1",
+					},
+					&entity.Item{
+						ID:   "id_2",
+						Name: "name_2",
+					},
+				},
+				Metadata: utils.PageMetadata{
+					Total:   utils.Of(2),
+					HasNext: utils.Of(false),
+					Limit:   utils.Of(10),
+					Offset:  utils.Of(1),
 				},
 			},
 		},
@@ -67,10 +106,6 @@ func TestItemService_ListItems(t *testing.T) {
 			ctx := context.Background()
 			itemRepo := repo.NewMockItemRepo(t)
 
-			// total := 2
-			// hasNext := false
-			// limit := 100
-			// offset := 0
 			itemRepo.EXPECT().FindByItemIDs(ctx, tt.args.req.ItemIDs, tt.args.req.Limit, tt.args.req.Offset).
 				Return(&repo.ListItemResult{
 					Items:    tt.wantRes.Items,

@@ -6,6 +6,8 @@ require (
 	ariga.io/entcache v0.1.0
 	entgo.io/ent v0.14.4
 	github.com/fatih/structtag v1.2.0
+	github.com/go-chi/chi/v5 v5.2.1
+	github.com/go-chi/render v1.0.3
 	github.com/go-redis/redis/v8 v8.11.3
 	github.com/jackc/pgx/v4 v4.18.3
 	github.com/mitchellh/mapstructure v1.5.0
@@ -20,6 +22,7 @@ require (
 require (
 	ariga.io/atlas v0.31.1-0.20250212144724-069be8033e83 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
+	github.com/ajg/form v1.5.1 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/bmatcuk/doublestar v1.3.4 // indirect

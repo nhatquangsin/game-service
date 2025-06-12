@@ -4,6 +4,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/nhatquangsin/game-service/app/api/impl"
+	transporthttp "github.com/nhatquangsin/game-service/app/api/transport/http"
 	"github.com/nhatquangsin/game-service/infra/config"
 	"github.com/nhatquangsin/game-service/infra/repo/database"
 	"github.com/nhatquangsin/game-service/infra/repo/repoimpl"
@@ -17,6 +18,7 @@ var svcFXModule = fx.Options(
 	database.FXModule,
 	impl.FXModule,
 	viperutil.FXModule,
+	transporthttp.ServerFXModule,
 )
 
 func newAPIApp() *fx.App {
