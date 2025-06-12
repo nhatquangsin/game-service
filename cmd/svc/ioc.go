@@ -5,6 +5,7 @@ import (
 
 	"github.com/nhatquangsin/game-service/app/api/impl"
 	transporthttp "github.com/nhatquangsin/game-service/app/api/transport/http"
+	"github.com/nhatquangsin/game-service/cache"
 	"github.com/nhatquangsin/game-service/infra/config"
 	"github.com/nhatquangsin/game-service/infra/repo/database"
 	"github.com/nhatquangsin/game-service/infra/repo/repoimpl"
@@ -19,6 +20,7 @@ var svcFXModule = fx.Options(
 	impl.FXModule,
 	viperutil.FXModule,
 	transporthttp.ServerFXModule,
+	cache.FXModule,
 )
 
 func newAPIApp() *fx.App {

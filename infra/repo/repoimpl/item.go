@@ -31,7 +31,28 @@ func NewItemRepo(
 }
 
 // FindAll to list all items.
-func (r *ItemRepo) FindAll(ctx context.Context, limit, offset int) (*repo.ListItemResult, error) {
+func (r *ItemRepo) FindAll(ctx context.Context) ([]*entity.Item, error) {
+	rows, err := r.client.Slave(ctx).Item.Query().All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var res []*entity.Item
+	for _, row := range rows {
+		i := &entity.Item{
+			ID:          row.ID,
+			Name:        row.Name,
+			Category:    row.Category,
+			Description: row.Description,
+		}
+
+		res = append(res, i)
+	}
+
+	return res, nil
+}
+
+// FindAllWithPagination to list all items with pagination.
+func (r *ItemRepo) FindAllWithPagination(ctx context.Context, limit, offset int) (*repo.ListItemResult, error) {
 	builder := r.client.Slave(ctx).Item.Query()
 	total, err := builder.Modify(func(s *sql.Selector) {
 		s.Select("COUNT(1)")
@@ -72,41 +93,22 @@ func (r *ItemRepo) FindAll(ctx context.Context, limit, offset int) (*repo.ListIt
 }
 
 // FindByItemIDs to find item by item id
-func (r *ItemRepo) FindByItemIDs(ctx context.Context, itemIDs []string, limit, offset int) (*repo.ListItemResult, error) {
-	builder := r.client.Slave(ctx).Item.Query().Where(item.IDIn(itemIDs...))
-	total, err := builder.Modify(func(s *sql.Selector) {
-		s.Select("COUNT(1)")
-	}).Int(ctx)
+func (r *ItemRepo) FindByItemIDs(ctx context.Context, itemIDs []string) ([]*entity.Item, error) {
+	rows, err := r.client.Slave(ctx).Item.Query().Where(item.IDIn(itemIDs...)).All(ctx)
 	if err != nil {
 		return nil, err
 	}
-
-	rows, err := builder.Modify(func(s *sql.Selector) {
-		s.Select(item.Columns...)
-	}).Offset(offset).Limit(limit).All(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	var res []*entity.Item
 	for _, row := range rows {
-		res = append(res, &entity.Item{
+		i := &entity.Item{
 			ID:          row.ID,
 			Name:        row.Name,
 			Category:    row.Category,
 			Description: row.Description,
-		})
+		}
+
+		res = append(res, i)
 	}
 
-	hasNext := total > limit+offset
-
-	return &repo.ListItemResult{
-		Items: res,
-		Metadata: utils.PageMetadata{
-			Total:   &total,
-			HasNext: &hasNext,
-			Offset:  &offset,
-			Limit:   &limit,
-		},
-	}, nil
+	return res, nil
 }

@@ -9,8 +9,9 @@ import (
 
 // ItemRepo exposed all function interact with items data.
 type ItemRepo interface {
-	FindAll(ctx context.Context, limit, offset int) (*ListItemResult, error)
-	FindByItemIDs(ctx context.Context, itemIDs []string, limit, offset int) (*ListItemResult, error)
+	FindAll(ctx context.Context) ([]*entity.Item, error)
+	FindAllWithPagination(ctx context.Context, limit, offset int) (*ListItemResult, error)
+	FindByItemIDs(ctx context.Context, itemIDs []string) ([]*entity.Item, error)
 }
 
 type ListItemResult struct {

@@ -7,6 +7,7 @@ package repo
 import (
 	"context"
 
+	"github.com/nhatquangsin/game-service/domain/entity"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -38,11 +39,73 @@ func (_m *MockItemRepo) EXPECT() *MockItemRepo_Expecter {
 }
 
 // FindAll provides a mock function for the type MockItemRepo
-func (_mock *MockItemRepo) FindAll(ctx context.Context, limit int, offset int) (*ListItemResult, error) {
-	ret := _mock.Called(ctx, limit, offset)
+func (_mock *MockItemRepo) FindAll(ctx context.Context) ([]*entity.Item, error) {
+	ret := _mock.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for FindAll")
+	}
+
+	var r0 []*entity.Item
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context) ([]*entity.Item, error)); ok {
+		return returnFunc(ctx)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context) []*entity.Item); ok {
+		r0 = returnFunc(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*entity.Item)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = returnFunc(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MockItemRepo_FindAll_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'FindAll'
+type MockItemRepo_FindAll_Call struct {
+	*mock.Call
+}
+
+// FindAll is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *MockItemRepo_Expecter) FindAll(ctx interface{}) *MockItemRepo_FindAll_Call {
+	return &MockItemRepo_FindAll_Call{Call: _e.mock.On("FindAll", ctx)}
+}
+
+func (_c *MockItemRepo_FindAll_Call) Run(run func(ctx context.Context)) *MockItemRepo_FindAll_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		run(
+			arg0,
+		)
+	})
+	return _c
+}
+
+func (_c *MockItemRepo_FindAll_Call) Return(items []*entity.Item, err error) *MockItemRepo_FindAll_Call {
+	_c.Call.Return(items, err)
+	return _c
+}
+
+func (_c *MockItemRepo_FindAll_Call) RunAndReturn(run func(ctx context.Context) ([]*entity.Item, error)) *MockItemRepo_FindAll_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// FindAllWithPagination provides a mock function for the type MockItemRepo
+func (_mock *MockItemRepo) FindAllWithPagination(ctx context.Context, limit int, offset int) (*ListItemResult, error) {
+	ret := _mock.Called(ctx, limit, offset)
+
+	if len(ret) == 0 {
+		panic("no return value specified for FindAllWithPagination")
 	}
 
 	var r0 *ListItemResult
@@ -65,20 +128,20 @@ func (_mock *MockItemRepo) FindAll(ctx context.Context, limit int, offset int) (
 	return r0, r1
 }
 
-// MockItemRepo_FindAll_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'FindAll'
-type MockItemRepo_FindAll_Call struct {
+// MockItemRepo_FindAllWithPagination_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'FindAllWithPagination'
+type MockItemRepo_FindAllWithPagination_Call struct {
 	*mock.Call
 }
 
-// FindAll is a helper method to define mock.On call
+// FindAllWithPagination is a helper method to define mock.On call
 //   - ctx context.Context
 //   - limit int
 //   - offset int
-func (_e *MockItemRepo_Expecter) FindAll(ctx interface{}, limit interface{}, offset interface{}) *MockItemRepo_FindAll_Call {
-	return &MockItemRepo_FindAll_Call{Call: _e.mock.On("FindAll", ctx, limit, offset)}
+func (_e *MockItemRepo_Expecter) FindAllWithPagination(ctx interface{}, limit interface{}, offset interface{}) *MockItemRepo_FindAllWithPagination_Call {
+	return &MockItemRepo_FindAllWithPagination_Call{Call: _e.mock.On("FindAllWithPagination", ctx, limit, offset)}
 }
 
-func (_c *MockItemRepo_FindAll_Call) Run(run func(ctx context.Context, limit int, offset int)) *MockItemRepo_FindAll_Call {
+func (_c *MockItemRepo_FindAllWithPagination_Call) Run(run func(ctx context.Context, limit int, offset int)) *MockItemRepo_FindAllWithPagination_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -101,38 +164,38 @@ func (_c *MockItemRepo_FindAll_Call) Run(run func(ctx context.Context, limit int
 	return _c
 }
 
-func (_c *MockItemRepo_FindAll_Call) Return(listItemResult *ListItemResult, err error) *MockItemRepo_FindAll_Call {
+func (_c *MockItemRepo_FindAllWithPagination_Call) Return(listItemResult *ListItemResult, err error) *MockItemRepo_FindAllWithPagination_Call {
 	_c.Call.Return(listItemResult, err)
 	return _c
 }
 
-func (_c *MockItemRepo_FindAll_Call) RunAndReturn(run func(ctx context.Context, limit int, offset int) (*ListItemResult, error)) *MockItemRepo_FindAll_Call {
+func (_c *MockItemRepo_FindAllWithPagination_Call) RunAndReturn(run func(ctx context.Context, limit int, offset int) (*ListItemResult, error)) *MockItemRepo_FindAllWithPagination_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // FindByItemIDs provides a mock function for the type MockItemRepo
-func (_mock *MockItemRepo) FindByItemIDs(ctx context.Context, itemIDs []string, limit int, offset int) (*ListItemResult, error) {
-	ret := _mock.Called(ctx, itemIDs, limit, offset)
+func (_mock *MockItemRepo) FindByItemIDs(ctx context.Context, itemIDs []string) ([]*entity.Item, error) {
+	ret := _mock.Called(ctx, itemIDs)
 
 	if len(ret) == 0 {
 		panic("no return value specified for FindByItemIDs")
 	}
 
-	var r0 *ListItemResult
+	var r0 []*entity.Item
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, []string, int, int) (*ListItemResult, error)); ok {
-		return returnFunc(ctx, itemIDs, limit, offset)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, []string) ([]*entity.Item, error)); ok {
+		return returnFunc(ctx, itemIDs)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, []string, int, int) *ListItemResult); ok {
-		r0 = returnFunc(ctx, itemIDs, limit, offset)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, []string) []*entity.Item); ok {
+		r0 = returnFunc(ctx, itemIDs)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*ListItemResult)
+			r0 = ret.Get(0).([]*entity.Item)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, []string, int, int) error); ok {
-		r1 = returnFunc(ctx, itemIDs, limit, offset)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, []string) error); ok {
+		r1 = returnFunc(ctx, itemIDs)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -147,13 +210,11 @@ type MockItemRepo_FindByItemIDs_Call struct {
 // FindByItemIDs is a helper method to define mock.On call
 //   - ctx context.Context
 //   - itemIDs []string
-//   - limit int
-//   - offset int
-func (_e *MockItemRepo_Expecter) FindByItemIDs(ctx interface{}, itemIDs interface{}, limit interface{}, offset interface{}) *MockItemRepo_FindByItemIDs_Call {
-	return &MockItemRepo_FindByItemIDs_Call{Call: _e.mock.On("FindByItemIDs", ctx, itemIDs, limit, offset)}
+func (_e *MockItemRepo_Expecter) FindByItemIDs(ctx interface{}, itemIDs interface{}) *MockItemRepo_FindByItemIDs_Call {
+	return &MockItemRepo_FindByItemIDs_Call{Call: _e.mock.On("FindByItemIDs", ctx, itemIDs)}
 }
 
-func (_c *MockItemRepo_FindByItemIDs_Call) Run(run func(ctx context.Context, itemIDs []string, limit int, offset int)) *MockItemRepo_FindByItemIDs_Call {
+func (_c *MockItemRepo_FindByItemIDs_Call) Run(run func(ctx context.Context, itemIDs []string)) *MockItemRepo_FindByItemIDs_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -163,30 +224,20 @@ func (_c *MockItemRepo_FindByItemIDs_Call) Run(run func(ctx context.Context, ite
 		if args[1] != nil {
 			arg1 = args[1].([]string)
 		}
-		var arg2 int
-		if args[2] != nil {
-			arg2 = args[2].(int)
-		}
-		var arg3 int
-		if args[3] != nil {
-			arg3 = args[3].(int)
-		}
 		run(
 			arg0,
 			arg1,
-			arg2,
-			arg3,
 		)
 	})
 	return _c
 }
 
-func (_c *MockItemRepo_FindByItemIDs_Call) Return(listItemResult *ListItemResult, err error) *MockItemRepo_FindByItemIDs_Call {
-	_c.Call.Return(listItemResult, err)
+func (_c *MockItemRepo_FindByItemIDs_Call) Return(items []*entity.Item, err error) *MockItemRepo_FindByItemIDs_Call {
+	_c.Call.Return(items, err)
 	return _c
 }
 
-func (_c *MockItemRepo_FindByItemIDs_Call) RunAndReturn(run func(ctx context.Context, itemIDs []string, limit int, offset int) (*ListItemResult, error)) *MockItemRepo_FindByItemIDs_Call {
+func (_c *MockItemRepo_FindByItemIDs_Call) RunAndReturn(run func(ctx context.Context, itemIDs []string) ([]*entity.Item, error)) *MockItemRepo_FindByItemIDs_Call {
 	_c.Call.Return(run)
 	return _c
 }

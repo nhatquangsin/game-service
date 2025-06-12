@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/go-chi/render"
-	"github.com/nhatquangsin/game-service/domain/entity"
 	"github.com/nhatquangsin/game-service/infra/utils"
 )
 
@@ -33,7 +32,7 @@ type ListItemsRequest struct {
 
 // ListItemsResponse represents a response for list item.
 type ListItemsResponse struct {
-	Items    []*entity.Item     `field:"_items" json:"_items,omitempty"`
+	Items    []*Item            `field:"_items" json:"_items,omitempty"`
 	Metadata utils.PageMetadata `field:"_metadata" json:"_metadata,omitempty"`
 }
 

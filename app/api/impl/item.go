@@ -4,20 +4,25 @@ import (
 	"context"
 
 	"github.com/nhatquangsin/game-service/app/api"
+	"github.com/nhatquangsin/game-service/cache"
 	"github.com/nhatquangsin/game-service/domain/repo"
+	"github.com/nhatquangsin/game-service/infra/utils"
 )
 
 // ItemService implements all use cases of Item.
 type ItemService struct {
-	itemRepo repo.ItemRepo
+	itemRepo    repo.ItemRepo
+	cachedItems *cache.CachedItems
 }
 
 // NewItemService creates and returns new instance of ItemService.
 func NewItemService(
 	itemRepo repo.ItemRepo,
+	cachedItems *cache.CachedItems,
 ) api.ItemService {
 	svc := &ItemService{
-		itemRepo: itemRepo,
+		itemRepo:    itemRepo,
+		cachedItems: cachedItems,
 	}
 
 	return svc
@@ -25,13 +30,25 @@ func NewItemService(
 
 // ListItems lists all items.
 func (s *ItemService) ListItems(ctx context.Context, req *api.ListItemsRequest) (*api.ListItemsResponse, error) {
-	result, err := s.itemRepo.FindByItemIDs(ctx, req.ItemIDs, req.Limit, req.Offset)
+	var result []*api.Item
+
+	data, err := s.itemRepo.FindByItemIDs(ctx, req.ItemIDs)
 	if err != nil {
 		return nil, err
 	}
 
+	filteredResult := utils.PaginationOnMem(data, req.Offset, req.Limit)
+	for _, i := range filteredResult.Items {
+		result = append(result, &api.Item{
+			ID:          i.ID,
+			Name:        i.Name,
+			Description: i.Description,
+			Category:    i.Category,
+		})
+	}
+
 	return &api.ListItemsResponse{
-		Items:    result.Items,
-		Metadata: result.Metadata,
+		Items:    result,
+		Metadata: filteredResult.Metadata,
 	}, nil
 }
