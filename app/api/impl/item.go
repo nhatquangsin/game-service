@@ -31,24 +31,41 @@ func NewItemService(
 // ListItems lists all items.
 func (s *ItemService) ListItems(ctx context.Context, req *api.ListItemsRequest) (*api.ListItemsResponse, error) {
 	var result []*api.Item
+	var pageMetadata utils.PageMetadata
 
-	data, err := s.itemRepo.FindByItemIDs(ctx, req.ItemIDs)
-	if err != nil {
-		return nil, err
-	}
+	if len(req.ItemIDs) == 0 {
+		filteredResult := utils.PaginationOnMem(s.cachedItems.Items, req.Offset, req.Limit)
+		for _, i := range filteredResult.Items {
+			result = append(result, &api.Item{
+				ID:          i.ID,
+				Name:        i.Name,
+				Description: i.Description,
+				Category:    i.Category,
+			})
+		}
 
-	filteredResult := utils.PaginationOnMem(data, req.Offset, req.Limit)
-	for _, i := range filteredResult.Items {
-		result = append(result, &api.Item{
-			ID:          i.ID,
-			Name:        i.Name,
-			Description: i.Description,
-			Category:    i.Category,
-		})
+		pageMetadata = filteredResult.Metadata
+	} else {
+		data, err := s.itemRepo.FindByItemIDs(ctx, req.ItemIDs)
+		if err != nil {
+			return nil, err
+		}
+
+		filteredResult := utils.PaginationOnMem(data, req.Offset, req.Limit)
+		for _, i := range filteredResult.Items {
+			result = append(result, &api.Item{
+				ID:          i.ID,
+				Name:        i.Name,
+				Description: i.Description,
+				Category:    i.Category,
+			})
+		}
+
+		pageMetadata = filteredResult.Metadata
 	}
 
 	return &api.ListItemsResponse{
 		Items:    result,
-		Metadata: filteredResult.Metadata,
+		Metadata: pageMetadata,
 	}, nil
 }
