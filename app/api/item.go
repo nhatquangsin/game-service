@@ -12,10 +12,21 @@ type ItemService interface {
 	ListItems(ctx context.Context, req *ListItemsRequest) (*ListItemsResponse, error)
 }
 
+// Item rest resource.
+//
+// +smkit:rest:resource=true
+type Item struct {
+	ID          string `json:"id,omitempty"`
+	Name        string `json:"name,omitempty"`
+	Category    string `json:"category,omitempty"`
+	Description string `json:"description,omitempty"`
+}
+
 // ListItemsRequest represents a request for list item.
 type ListItemsRequest struct {
-	Offset int `json:"-" query:"offset" field:"offset" validate:"gte=0"`
-	Limit  int `json:"-" query:"limit" field:"limit" validate:"gte=1,lte=100"`
+	ItemIDs []string `json:"-" query:"itemIDs" validate:"max=100"`
+	Offset  int      `json:"-" query:"offset" field:"offset" validate:"gte=0"`
+	Limit   int      `json:"-" query:"limit" field:"limit" validate:"gte=1,lte=100"`
 }
 
 // ListItemsResponse represents a response for list item.

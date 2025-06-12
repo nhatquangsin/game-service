@@ -3,11 +3,14 @@ package repoimpl
 import (
 	"context"
 
+	"entgo.io/ent/dialect/sql"
+
 	"github.com/nhatquangsin/game-service/domain/entity"
 	"github.com/nhatquangsin/game-service/domain/repo"
 	"github.com/nhatquangsin/game-service/infra/config"
 	"github.com/nhatquangsin/game-service/infra/repo/database"
 	"github.com/nhatquangsin/game-service/infra/repo/entc/item"
+	"github.com/nhatquangsin/game-service/infra/utils"
 )
 
 // ItemRepo implements interface ItemRepo.
@@ -28,10 +31,18 @@ func NewItemRepo(
 }
 
 // FindAll to list all items.
-func (r *ItemRepo) FindAll(ctx context.Context) ([]*entity.Item, error) {
-	rows, err := r.client.Slave(ctx).Item.Query().
-		Unique(false).
-		All(ctx)
+func (r *ItemRepo) FindAll(ctx context.Context, limit, offset int) (*repo.ListItemResult, error) {
+	builder := r.client.Slave(ctx).Item.Query()
+	total, err := builder.Modify(func(s *sql.Selector) {
+		s.Select("COUNT(1)")
+	}).Int(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := builder.Modify(func(s *sql.Selector) {
+		s.Select(item.Columns...)
+	}).Offset(offset).Limit(limit).All(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -47,12 +58,32 @@ func (r *ItemRepo) FindAll(ctx context.Context) ([]*entity.Item, error) {
 		res = append(res, i)
 	}
 
-	return res, nil
+	hasNext := total > limit+offset
+
+	return &repo.ListItemResult{
+		Items: res,
+		Metadata: utils.PageMetadata{
+			Total:   &total,
+			HasNext: &hasNext,
+			Offset:  &offset,
+			Limit:   &limit,
+		},
+	}, nil
 }
 
 // FindByItemIDs to find item by item id
-func (r *ItemRepo) FindByItemIDs(ctx context.Context, itemIDs []string) ([]*entity.Item, error) {
-	rows, err := r.client.Slave(ctx).Item.Query().Where(item.IDIn(itemIDs...)).Unique(false).All(ctx)
+func (r *ItemRepo) FindByItemIDs(ctx context.Context, itemIDs []string, limit, offset int) (*repo.ListItemResult, error) {
+	builder := r.client.Slave(ctx).Item.Query().Where(item.IDIn(itemIDs...))
+	total, err := builder.Modify(func(s *sql.Selector) {
+		s.Select("COUNT(1)")
+	}).Int(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := builder.Modify(func(s *sql.Selector) {
+		s.Select(item.Columns...)
+	}).Offset(offset).Limit(limit).All(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -67,5 +98,15 @@ func (r *ItemRepo) FindByItemIDs(ctx context.Context, itemIDs []string) ([]*enti
 		})
 	}
 
-	return res, nil
+	hasNext := total > limit+offset
+
+	return &repo.ListItemResult{
+		Items: res,
+		Metadata: utils.PageMetadata{
+			Total:   &total,
+			HasNext: &hasNext,
+			Offset:  &offset,
+			Limit:   &limit,
+		},
+	}, nil
 }

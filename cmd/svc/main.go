@@ -1,7 +1,16 @@
 package main
 
-import "fmt"
+import (
+	"log"
+	"os"
+
+	// Automatically set GOMAXPROCS to match Linux container CPU quota.
+	_ "go.uber.org/automaxprocs"
+)
 
 func main() {
-	fmt.Println("hello world")
+	app := newApp()
+	if err := app.Run(os.Args); err != nil {
+		log.Fatal(err)
+	}
 }
